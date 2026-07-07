@@ -9,7 +9,10 @@ const enviarCodigo = async (email, codigo) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-    tls: { rejectUnauthorized: false }
+    tls: { rejectUnauthorized: false },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000
   })
   await transporter.sendMail({
     from: `"Eyefind" <${process.env.EMAIL_USER}>`,
@@ -23,14 +26,38 @@ const registro = async (req, res) => {
   const { nombre, email, password } = req.body
   try {
     const existe = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email])
-    if (existe.rows.length > 0) return res.status(400).json({ error: 'Email ya registrado' })
+
+    if (existe.rows.length > 0) {
+      // Si ya existe pero nunca se verificó, le reenviamos el código
+      // en vez de bloquearlo para siempre (por ejemplo, si el correo
+      // falló la primera vez).
+      if (!existe.rows[0].verificado) {
+        const nuevoCodigo = generarCodigo()
+        await pool.query('UPDATE usuarios SET codigo_verificacion = $1 WHERE email = $2', [nuevoCodigo, email])
+        await enviarCodigo(email, nuevoCodigo)
+        return res.json({ message: 'Código reenviado al correo' })
+      }
+      return res.status(400).json({ error: 'Email ya registrado' })
+    }
+
     const hash = await bcrypt.hash(password, 10)
     const codigo = generarCodigo()
-    await pool.query(
-      'INSERT INTO usuarios (nombre, email, password, codigo_verificacion) VALUES ($1, $2, $3, $4)',
+
+    const nuevoUsuario = await pool.query(
+      'INSERT INTO usuarios (nombre, email, password, codigo_verificacion) VALUES ($1, $2, $3, $4) RETURNING id',
       [nombre, email, hash, codigo]
     )
-    await enviarCodigo(email, codigo)
+
+    try {
+      await enviarCodigo(email, codigo)
+    } catch (mailErr) {
+      // Si el correo falla, deshacemos el registro para que la
+      // persona pueda intentarlo de nuevo sin quedar atascada.
+      await pool.query('DELETE FROM usuarios WHERE id = $1', [nuevoUsuario.rows[0].id])
+      console.log('ERROR ENVIANDO CORREO:', mailErr)
+      return res.status(500).json({ error: 'No se pudo enviar el correo de verificación. Intenta de nuevo.' })
+    }
+
     res.json({ message: 'Código enviado al correo' })
   } catch (err) {
     console.log('ERROR REGISTRO:', err)
