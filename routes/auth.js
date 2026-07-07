@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { registro, verificarCodigo, login, solicitarRecuperacion, verificarRecuperacion, cambiarPassword, eliminarCuenta } = require('../controllers/authController')
-const verifyToken = require('../middlewares/verifyToken')
+const verifyToken = require('../middlewares/verifytoken')
 
 router.post('/registro', registro)
 router.post('/verificar', verificarCodigo)
