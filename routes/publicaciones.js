@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { crearPublicacion, getFeed, getPublicacionesUsuario, eliminarPublicacion } = require('../controllers/publicacionesController')
-const verifyToken = require('../middlewares/verifyToken')
+const verifyToken = require('../middlewares/verifytoken')
 
 router.post('/', verifyToken, crearPublicacion)
 router.get('/feed', verifyToken, getFeed)

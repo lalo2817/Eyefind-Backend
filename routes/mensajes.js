@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { enviarMensaje, getConversacion, getChats, marcarLeido } = require('../controllers/mensajesController')
-const verifyToken = require('../middlewares/verifyToken')
+const verifyToken = require('../middlewares/verifytoken')
 
 router.post('/', verifyToken, enviarMensaje)
 router.get('/chats', verifyToken, getChats)

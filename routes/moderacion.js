@@ -9,7 +9,7 @@ const {
   eliminarCuentaModerada,
   ignorarReporte
 } = require('../controllers/moderacionController')
-const verifyToken = require('../middlewares/verifyToken')
+const verifyToken = require('../middlewares/verifytoken')
 
 router.post('/reportar', verifyToken, reportarPublicacion)
 router.get('/', verifyToken, getReportesPendientes)

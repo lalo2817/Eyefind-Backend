@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { getPerfilPropio, getPerfil, actualizarPerfil, getEstadoAmistad, getAmigosDeUsuario } = require('../controllers/perfilController')
-const verifyToken = require('../middlewares/verifyToken')
+const verifyToken = require('../middlewares/verifytoken')
 
 router.get('/me', verifyToken, getPerfilPropio)
 router.get('/estado/:usuario_id', verifyToken, getEstadoAmistad)

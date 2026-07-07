@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { enviarSolicitud, aceptarSolicitud, rechazarSolicitud, getAmigos, getSolicitudes, getSugerencias } = require('../controllers/amigosController')
-const verifyToken = require('../middlewares/verifyToken')
+const verifyToken = require('../middlewares/verifytoken')
 
 router.post('/solicitud', verifyToken, enviarSolicitud)
 router.post('/aceptar', verifyToken, aceptarSolicitud)

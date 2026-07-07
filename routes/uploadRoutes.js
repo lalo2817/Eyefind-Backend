@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 const upload = require('../config/multer')
-const verifyToken = require('../middlewares/verifyToken')
+const verifyToken = require('../middlewares/verifytoken')
 
 const {
   subirAvatar,

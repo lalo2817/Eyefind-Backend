@@ -5,7 +5,7 @@ const {
   unirseGrupo, salirGrupo, transferirAdmin, eliminarGrupo, getMiembros, eliminarMiembro, invitarAlGrupo,
   getPublicacionesGrupo, crearPublicacionGrupo, eliminarPublicacionGrupo
 } = require('../controllers/gruposController')
-const verifyToken = require('../middlewares/verifyToken')
+const verifyToken = require('../middlewares/verifytoken')
 
 router.get('/', verifyToken, getGrupos)
 router.post('/', verifyToken, crearGrupo)
