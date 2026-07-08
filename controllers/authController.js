@@ -1,31 +1,20 @@
 const pool = require('../config/db')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const nodemailer = require('nodemailer')
+const { Resend } = require('resend')
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 const generarCodigo = () => Math.floor(100000 + Math.random() * 900000).toString()
 
-const dns = require('dns')
-
 const enviarCodigo = async (email, codigo) => {
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    family: 4,
-    lookup: (hostname, options, callback) => dns.lookup(hostname, { family: 4 }, callback),
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-    tls: { rejectUnauthorized: false },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000
-  })
-  await transporter.sendMail({
-    from: `"Eyefind" <${process.env.EMAIL_USER}>`,
+  const { error } = await resend.emails.send({
+    from: 'Eyefind <onboarding@resend.dev>',
     to: email,
     subject: 'Código de verificación - Eyefind',
     html: `<h2>Tu código es: <strong>${codigo}</strong></h2><p>No compartas este código con nadie.</p>`
   })
+  if (error) throw new Error(error.message || 'Error enviando el correo')
 }
 
 const registro = async (req, res) => {
@@ -261,4 +250,4 @@ const eliminarCuenta = async (req, res) => {
   }
 }
 
-module.exports = { registro, verificarCodigo, login, solicitarRecuperacion, verificarRecuperacion, cambiarPassword, eliminarCuenta } 
+module.exports = { registro, verificarCodigo, login, solicitarRecuperacion, verificarRecuperacion, cambiarPassword, eliminarCuenta }
