@@ -7,7 +7,10 @@ const generarCodigo = () => Math.floor(100000 + Math.random() * 900000).toString
 
 const enviarCodigo = async (email, codigo) => {
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    family: 4,
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     tls: { rejectUnauthorized: false },
     connectionTimeout: 10000,
