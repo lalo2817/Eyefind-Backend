@@ -5,12 +5,15 @@ const nodemailer = require('nodemailer')
 
 const generarCodigo = () => Math.floor(100000 + Math.random() * 900000).toString()
 
+const dns = require('dns')
+
 const enviarCodigo = async (email, codigo) => {
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
     secure: true,
     family: 4,
+    lookup: (hostname, options, callback) => dns.lookup(hostname, { family: 4 }, callback),
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     tls: { rejectUnauthorized: false },
     connectionTimeout: 10000,
@@ -258,4 +261,4 @@ const eliminarCuenta = async (req, res) => {
   }
 }
 
-module.exports = { registro, verificarCodigo, login, solicitarRecuperacion, verificarRecuperacion, cambiarPassword, eliminarCuenta }
+module.exports = { registro, verificarCodigo, login, solicitarRecuperacion, verificarRecuperacion, cambiarPassword, eliminarCuenta } 
